@@ -1,32 +1,27 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useHistory, useLocation } from "react-router-dom";
+import { useHistory } from "react-router-dom";
+import { useState, ChangeEvent } from "react";
+import { RootState } from '../../store';
+import { userAdded } from "../../redux/userAction";
 
-import { useState } from "react";
-import { userUpdated } from "./usersSlice";
-
-export function EditUser() {
-  const { pathname } = useLocation();
-  const userId = parseInt(pathname.replace("/edit-user/", ""));
-
-  const user = useSelector((state) =>
-    state.users.entities.find((user) => user.id === userId)
-  );
-
+export function AddUser() {
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const [name, setName] = useState(user.name);
-  const [email, setEmail] = useState(user.email);
-  const [error, setError] = useState(null);
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
 
-  const handleName = (e) => setName(e.target.value);
-  const handleEmail = (e) => setEmail(e.target.value);
+  const handleName = (e: ChangeEvent<HTMLInputElement>) => setName(e.target.value);
+  const handleEmail = (e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
+
+  const usersAmount = useSelector((state: RootState) => state.users.entities.length);
 
   const handleClick = () => {
     if (name && email) {
       dispatch(
-        userUpdated({
-          id: userId,
+        userAdded({
+          id: usersAmount + 1,
           name,
           email,
         })
@@ -37,12 +32,15 @@ export function EditUser() {
     } else {
       setError("Fill in all fields");
     }
+
+    setName("");
+    setEmail("");
   };
 
   return (
     <div className="container">
       <div className="row">
-        <h1>Edit user</h1>
+        <h1>Add user</h1>
       </div>
       <div className="row">
         <div className="three columns">
@@ -64,9 +62,9 @@ export function EditUser() {
             onChange={handleEmail}
             value={email}
           />
-          {error && error}
+          {error && <div style={{ color: 'red' }}>{error}</div>}
           <button onClick={handleClick} className="button-primary">
-            Save user
+            Add user
           </button>
         </div>
       </div>

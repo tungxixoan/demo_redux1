@@ -1,9 +1,8 @@
 import App from "./App";
 import { Provider } from "react-redux";
-import React from "react";
 import ReactDOM from "react-dom";
-import { fetchUsers } from "./features/users/usersSlice";
 import store from "./store";
+import { fetchUsers } from "./thunks/userThunk";
 
 store.dispatch(fetchUsers());
 

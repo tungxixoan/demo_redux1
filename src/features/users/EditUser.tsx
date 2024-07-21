@@ -1,27 +1,33 @@
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory, useLocation } from "react-router-dom";
+import { useState, ChangeEvent } from "react";
+import { RootState } from '../../store';
+import { User } from "../../types/userType";
+import { userUpdated } from "../../redux/userAction";
 
-import { useHistory } from "react-router-dom";
-import { useState } from "react";
-import { userAdded } from "./usersSlice";
+export function EditUser() {
+  const { pathname } = useLocation();
+  const userId = parseInt(pathname.replace("/edit-user/", ""));
 
-export function AddUser() {
+  const user = useSelector((state: RootState) =>
+    state.users.entities.find((user: User) => user.id === userId)
+  );
+
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState(null);
+  const [name, setName] = useState(user?.name || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [error, setError] = useState<string | null>(null);
 
-  const handleName = (e) => setName(e.target.value);
-  const handleEmail = (e) => setEmail(e.target.value);
-
-  const usersAmount = useSelector((state) => state.users.entities.length);
+  const handleName = (e: ChangeEvent<HTMLInputElement>) => setName(e.target.value);
+  const handleEmail = (e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
 
   const handleClick = () => {
     if (name && email) {
       dispatch(
-        userAdded({
-          id: usersAmount + 1,
+        userUpdated({
+          id: userId,
           name,
           email,
         })
@@ -32,15 +38,12 @@ export function AddUser() {
     } else {
       setError("Fill in all fields");
     }
-
-    setName("");
-    setEmail("");
   };
 
   return (
     <div className="container">
       <div className="row">
-        <h1>Add user</h1>
+        <h1>Edit user</h1>
       </div>
       <div className="row">
         <div className="three columns">
@@ -64,7 +67,7 @@ export function AddUser() {
           />
           {error && error}
           <button onClick={handleClick} className="button-primary">
-            Add user
+            Save user
           </button>
         </div>
       </div>

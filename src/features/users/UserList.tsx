@@ -1,16 +1,17 @@
-import { fetchUsers, userDeleted } from "./usersSlice";
 import { useDispatch, useSelector } from "react-redux";
-
 import { Link } from "react-router-dom";
+import { RootState } from "../../store";
+import { userDeleted } from "../../redux/userAction";
+import { fetchUsers } from "../../thunks/userThunk";
+import { User } from "../../types/userType";
 
 export function UserList() {
   const dispatch = useDispatch();
+  const entities = useSelector((state: RootState) => state.users.entities);
+  const loading = useSelector((state: RootState) => state.users.loading);
 
-  const { entities } = useSelector((state) => state.users);
-  const loading = useSelector((state) => state.loading);
-
-  const handleDelete = (id) => {
-    dispatch(userDeleted({ id }));
+  const handleDelete = (id: number) => {
+    dispatch(userDeleted( id ));
   };
 
   return (
@@ -47,9 +48,9 @@ export function UserList() {
               </tr>
             </thead>
             <tbody>
-              {entities.length &&
-                entities.map(({ id, name, email }, i) => (
-                  <tr key={i}>
+              {entities.length > 0 &&
+                entities.map(({ id, name, email }: User) => (
+                  <tr key={id}>
                     <td>{id}</td>
                     <td>{name}</td>
                     <td>{email}</td>
